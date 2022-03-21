@@ -16,6 +16,6 @@ class Formatter
         } else {
             $data = ['status'=>false,'messages'=>'Data not Found'];
         }
-        return $data;
+        return response()->json($data);
     }
 }

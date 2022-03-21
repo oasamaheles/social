@@ -6,6 +6,7 @@ use App\Helper\Formatter;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -17,43 +18,40 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::latest('id')->get();
-        $posts = Formatter::formatter($posts,'Posts');
-        return response()->json($posts);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $posts = Formatter::formatter($posts, 'Posts');
+        return $posts;
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'content' => 'required',
+        ]);
+        $data['user_id'] = $request->user()->id;
+        $post = DB::table('posts')
+            ->insertGetId($data);
+        $post = Formatter::formatter($post, 'Posts');
+        return $post;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $post = Post::with(['comments','user'])
+        $post = Post::with(['comments', 'user'])
             ->withCount('comments')
             ->find($id);
-        $post = Formatter::formatter($post,'Post With suer Details and comments');
+        $post = Formatter::formatter($post, 'Post With suer Details and comments');
 
         return response()->json($post);
     }
@@ -61,7 +59,7 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -72,8 +70,8 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -84,7 +82,7 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

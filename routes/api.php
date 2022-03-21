@@ -28,6 +28,8 @@ Route::group(['prefix' => 'v1','middleware'=>'auth:api'], function () {
     Route::resource('users', UserController::class);
     Route::resource('posts', \App\Http\Controllers\Api\PostController::class);
     Route::resource('comments', \App\Http\Controllers\Api\CommentController::class);
+    Route::post('comments/post/{post_id}', [\App\Http\Controllers\Api\CommentController::class,'store']);
+//    Route::put('comments/{id}', [\App\Http\Controllers\Api\CommentController::class,'update']);
 
 
 //
